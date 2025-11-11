@@ -27,7 +27,7 @@ phases:
       - docker push ${ECR_REPO_URI}:${IMAGE_TAG}
       - docker push ${ECR_REPO_URI}:latest
       - echo "Creating imagedefinitions.json in root directory..."
-      - printf '[{"name":"exercise-hello-service","imageUri":"%s"}]' ${ECR_REPO_URI}:${IMAGE_TAG} > imagedefinitions.json
+      - printf '[{"name":"exercise-hello-svc","imageUri":"%s"}]' ${ECR_REPO_URI}:${IMAGE_TAG} > imagedefinitions.json
       - ls -l imagedefinitions.json
       - cat imagedefinitions.json
 
