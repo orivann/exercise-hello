@@ -19,16 +19,19 @@ phases:
       - cd app
       - echo "Building Docker image..."
       - docker build -t ${ECR_REPO_URI}:${IMAGE_TAG} -t ${ECR_REPO_URI}:latest .
+      - cd ..
   post_build:
     commands:
       - echo "Build completed on $(date)"
       - echo "Pushing Docker images..."
       - docker push ${ECR_REPO_URI}:${IMAGE_TAG}
       - docker push ${ECR_REPO_URI}:latest
-      - echo "Creating imagedefinitions.json..."
+      - echo "Creating imagedefinitions.json in root directory..."
       - printf '[{"name":"exercise-hello-service","imageUri":"%s"}]' ${ECR_REPO_URI}:${IMAGE_TAG} > imagedefinitions.json
+      - ls -l imagedefinitions.json
       - cat imagedefinitions.json
 
 artifacts:
   files:
     - imagedefinitions.json
+  discard-paths: yes
