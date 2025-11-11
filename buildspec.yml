@@ -10,23 +10,19 @@ phases:
     commands:
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
-
+      - echo "Determining image tag..."
+      - export IMAGE_TAG=$(echo ${CODEBUILD_RESOLVED_SOURCE_VERSION:-"manual-$(date +%Y%m%d%H%M%S)"} | cut -c1-7)
+      - echo "Using IMAGE_TAG=$IMAGE_TAG"
   build:
     commands:
       - echo "Build started on $(date)"
       - cd app
-      - echo "Determining image tag..."
-      - export IMAGE_TAG=$(echo ${CODEBUILD_RESOLVED_SOURCE_VERSION:-"manual-$(date +%Y%m%d%H%M%S)"} | cut -c1-7)
-      - echo "Using IMAGE_TAG=$IMAGE_TAG"
-      - echo $IMAGE_TAG | tee ../image_tag.txt
       - echo "Building Docker image..."
       - docker build -t ${ECR_REPO_URI}:${IMAGE_TAG} -t ${ECR_REPO_URI}:latest .
-
   post_build:
     commands:
       - echo "Build completed on $(date)"
-      - export IMAGE_TAG=$(cat image_tag.txt)
-      - echo "Pushing Docker images with tag: ${IMAGE_TAG}"
+      - echo "Pushing Docker images..."
       - docker push ${ECR_REPO_URI}:${IMAGE_TAG}
       - docker push ${ECR_REPO_URI}:latest
       - echo "Creating imagedefinitions.json..."
