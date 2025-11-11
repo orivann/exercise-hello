@@ -1,12 +1,169 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>Hello World from ECS!</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Hello from ECS</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0f172a;
+        --bg-card: rgba(15, 23, 42, 0.85);
+        --glow: rgba(59, 130, 246, 0.8);
+        --text: #e2e8f0;
+        --accent: #38bdf8;
+        --accent-strong: #0ea5e9;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15), transparent 60%),
+          radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.25), transparent 45%),
+          var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .card {
+        width: min(560px, 100%);
+        padding: 2.5rem;
+        background: var(--bg-card);
+        border-radius: 28px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        box-shadow: 0 10px 50px rgba(15, 23, 42, 0.6);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(120deg, rgba(56, 189, 248, 0.35), transparent, rgba(14, 165, 233, 0.25));
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      h1 {
+        margin-top: 0;
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        letter-spacing: -0.01em;
+      }
+
+      p {
+        margin: 0.75rem 0 2rem;
+        line-height: 1.6;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.5rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.12);
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+      }
+
+      .tile {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 18px;
+        padding: 1.2rem;
+      }
+
+      .tile strong {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--accent);
+        margin-bottom: 0.35rem;
+      }
+
+      .cta {
+        margin-top: 2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+        color: #0f172a;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+        box-shadow: 0 20px 40px rgba(14, 165, 233, 0.35);
+      }
+
+      .cta:hover {
+        transform: translateY(-2px);
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello World from ECS Fargate behind ALB 🎉</h1>
-    <p>This app runs inside private subnets and is reachable only via the ALB.</p>
+    <main class="card" role="main">
+      <span class="badge" aria-label="Stack information">AWS ECS · Fargate · ALB</span>
+      <h1>Hello from ECS Fargate 🎉</h1>
+      <p>
+        This container runs in private subnets and surfaces through an Application Load Balancer.
+        You're seeing a live deployment powered by AWS infrastructure-as-code.
+      </p>
+
+      <section class="grid" aria-label="Deployment facts">
+        <article class="tile">
+          <strong>Scalable</strong>
+          Auto-scaling tasks keep traffic smooth as your audience grows.
+        </article>
+        <article class="tile">
+          <strong>Secure</strong>
+          Private networking limits access to the ALB entry point only.
+        </article>
+        <article class="tile">
+          <strong>Observable</strong>
+          Logs and metrics stream to CloudWatch for quick insight.
+        </article>
+      </section>
+
+      <a class="cta" href="https://aws.amazon.com/ecs/" target="_blank" rel="noreferrer">
+        Explore the ECS Docs →
+      </a>
+    </main>
   </body>
 </html>
-
