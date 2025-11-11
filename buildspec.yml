@@ -2,14 +2,16 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_TAG: "$CODEBUILD_RESOLVED_SOURCE_VERSION"
+    AWS_DEFAULT_REGION: "us-east-1"
+    ECR_REPO_URI: "043309328819.dkr.ecr.us-east-1.amazonaws.com/exercise-hello-repo"
 
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo "Using image tag: $IMAGE_TAG"
   build:
     commands:
       - echo Build started on `date`
@@ -17,12 +19,12 @@ phases:
       - docker build -t $ECR_REPO_URI:$IMAGE_TAG -t $ECR_REPO_URI:latest .
   post_build:
     commands:
+      - echo Build completed on `date`
       - echo Pushing Docker images...
       - docker push $ECR_REPO_URI:$IMAGE_TAG
       - docker push $ECR_REPO_URI:latest
-      - echo Writing imagedefinitions.json
-      - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$ECR_REPO_URI:$IMAGE_TAG" > imagedefinitions.json
+      - echo Writing image definitions file...
+      - printf '[{"name":"exercise-hello-service","imageUri":"%s"}]' $ECR_REPO_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
   files:
     - imagedefinitions.json
-
