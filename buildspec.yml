@@ -10,30 +10,29 @@ phases:
     commands:
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+
   build:
     commands:
       - echo "Build started on $(date)"
       - cd app
+      - echo "Determining image tag..."
+      - export IMAGE_TAG=$(echo ${CODEBUILD_RESOLVED_SOURCE_VERSION:-"manual-$(date +%Y%m%d%H%M%S)"} | cut -c1-7)
+      - echo "Using IMAGE_TAG=$IMAGE_TAG"
+      - echo $IMAGE_TAG | tee ../image_tag.txt
       - echo "Building Docker image..."
-      - |
-        if [ -z "$CODEBUILD_RESOLVED_SOURCE_VERSION" ]; then
-          IMAGE_TAG=$(date +%Y%m%d%H%M%S)
-        else
-          IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-        fi
-        echo "Using image tag: $IMAGE_TAG"
-        docker build -t ${ECR_REPO_URI}:${IMAGE_TAG} -t ${ECR_REPO_URI}:latest .
-        docker tag ${ECR_REPO_URI}:latest ${ECR_REPO_URI}:${IMAGE_TAG}
-        echo $IMAGE_TAG > ../image_tag.txt
+      - docker build -t ${ECR_REPO_URI}:${IMAGE_TAG} -t ${ECR_REPO_URI}:latest .
+
   post_build:
     commands:
       - echo "Build completed on $(date)"
-      - IMAGE_TAG=$(cat image_tag.txt)
-      - echo "Pushing Docker images..."
+      - export IMAGE_TAG=$(cat image_tag.txt)
+      - echo "Pushing Docker images with tag: ${IMAGE_TAG}"
       - docker push ${ECR_REPO_URI}:${IMAGE_TAG}
       - docker push ${ECR_REPO_URI}:latest
-      - echo "Writing imagedefinitions.json file..."
+      - echo "Creating imagedefinitions.json..."
       - printf '[{"name":"exercise-hello-service","imageUri":"%s"}]' ${ECR_REPO_URI}:${IMAGE_TAG} > imagedefinitions.json
+      - cat imagedefinitions.json
+
 artifacts:
   files:
     - imagedefinitions.json
