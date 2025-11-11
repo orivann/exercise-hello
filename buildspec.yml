@@ -10,12 +10,14 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      # יוצרים TAG חוקי מחלק ראשון של ה-commit hash
+      - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo "Using image tag: $IMAGE_TAG"
   build:
     commands:
       - echo Build started on `date`
       - cd app
+      - echo Building Docker image...
       - docker build -t $ECR_REPO_URI:$IMAGE_TAG -t $ECR_REPO_URI:latest .
   post_build:
     commands:
@@ -23,7 +25,7 @@ phases:
       - echo Pushing Docker images...
       - docker push $ECR_REPO_URI:$IMAGE_TAG
       - docker push $ECR_REPO_URI:latest
-      - echo Writing image definitions file...
+      - echo Writing imagedefinitions.json file...
       - printf '[{"name":"exercise-hello-service","imageUri":"%s"}]' $ECR_REPO_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
   files:
